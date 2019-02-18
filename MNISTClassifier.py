@@ -19,7 +19,7 @@ layers = [il,hl1,hl2,ol]
 
 # Initializes the network, loading the weights and biases from the files
 # weightImportFile="weights.txt", biasImportFile="biases.txt"
-network = nn.NeuralNetwork(layers, learningRate=0.01)
+network = nn.NeuralNetwork(layers, learningRate=0.01, weightImportFile="weights.txt", biasImportFile="biases.txt")
             
 
 def vectorizeDigit(digit):
@@ -42,11 +42,12 @@ def prepareInputVector(vector):
     returnVector.shape = (784,1)
     return returnVector
 
-
+'''
 print("Beginning training...")
 
 # Stores the size of each training batch
 batchSize = 25
+
 
 # Training loop
 for i in range(60000):
@@ -76,7 +77,8 @@ for i in range(60000):
         # Prints that
         print("Got the number correct: " + str(isCorrect))
         print("Label: " + str(lblTrain[index]) + " | Guess: " + str(guess))
-
+'''
+print("Iterating through the test examples...")
 # Holds how many correct guesses the computer has had
 totalCorrect = 0
 # Testing loop
@@ -135,7 +137,7 @@ def drawData(data, size):
             x+=1
 
 running = True
-index=0
+index=random.randint(0,9999)
 
 # Set the input
 network.layers[0] = prepareInputVector(imgTest[index])
@@ -154,8 +156,8 @@ while running:
             running = False
         if(i.type == pygame.KEYDOWN):
             if(i.key == pygame.K_RETURN):
-                # Move on to the next example
-                index +=1
+                # Move on to a random example
+                index=random.randint(0,9999)
                 # Set the input
                 network.layers[0] = prepareInputVector(imgTest[index])
                 # Gets the computers prediction based off the data
