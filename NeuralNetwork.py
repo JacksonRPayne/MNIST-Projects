@@ -181,6 +181,8 @@ class NeuralNetwork:
         # Sets the weightMatrices to the list constructed from the file
         self.biasMatrices = newBiasList.copy()
     
+
+
 ''''
 il = np.array([(4,10,3)])
 il.shape = (3,1)
