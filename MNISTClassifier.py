@@ -2,6 +2,7 @@ import NeuralNetwork as nn
 import numpy as np
 import mnist
 import pygame
+import random
 
 # Get data from MNIST
 # NOTE: I did not write the code to retrieve the data, code taken from:
@@ -18,7 +19,7 @@ layers = [il,hl1,hl2,ol]
 
 # Initializes the network, loading the weights and biases from the files
 # weightImportFile="weights.txt", biasImportFile="biases.txt"
-network = nn.NeuralNetwork(layers, learningRate=0.1, weightImportFile="weights.txt", biasImportFile="biases.txt")
+network = nn.NeuralNetwork(layers, learningRate=0.01,weightImportFile="weights.txt", biasImportFile="biases.txt")
             
 
 def vectorizeDigit(digit):
@@ -44,11 +45,23 @@ def prepareInputVector(vector):
 '''
 print("Beginning training...")
 
+# Stores the size of each training batch
+batchSize = 25
+
 # Training loop
-for i in range(60000):
+for i in range(150000):
+    #Chooses a random training exaple index
+    index = random.randint(0,59999)
+    
     # Train network on data with labels
-    loss = network.trainStochastically(prepareInputVector(imgTrain[i]), vectorizeDigit(lblTrain[i]))
-    # Print loss every thousand times
+    loss = network.computeGradientsAndDeltas(prepareInputVector(imgTrain[index]), vectorizeDigit(lblTrain[index]))
+    
+    # After every batchsize times
+    if(i%batchSize==0):
+        # Apply the gradients and deltas
+        network.updateWeightsAndBiases()
+    
+    # Print loss every hundred times
     if(i%100==0):
         # Adds up all the loss
         totalLoss = 0
@@ -59,10 +72,10 @@ for i in range(60000):
         # Gets computer guess
         guess = np.argmax(network.feedForward())
         # Gets if the guess was correct
-        isCorrect = lblTrain[i] == guess
+        isCorrect = lblTrain[index] == guess
         # Prints that
         print("Got the number correct: " + str(isCorrect))
-        print("Label: " + str(lblTrain[i]) + " | Guess: " + str(guess))
+        print("Label: " + str(lblTrain[index]) + " | Guess: " + str(guess))
 '''
 # Holds how many correct guesses the computer has had
 totalCorrect = 0
