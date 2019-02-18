@@ -11,15 +11,15 @@ imgTrain, lblTrain, imgTest, lblTest = mnist.load()
 
 # Initialize input, hidden and output layers
 il = np.zeros((784, 1))
-hl1 = np.zeros((16,1))
-hl2 = np.zeros((16,1))
+hl1 = np.zeros((256,1))
+hl2 = np.zeros((256,1))
 ol = np.zeros((10,1))
 
 layers = [il,hl1,hl2,ol]
 
 # Initializes the network, loading the weights and biases from the files
 # weightImportFile="weights.txt", biasImportFile="biases.txt"
-network = nn.NeuralNetwork(layers, learningRate=0.01,weightImportFile="weights.txt", biasImportFile="biases.txt")
+network = nn.NeuralNetwork(layers, learningRate=0.01)
             
 
 def vectorizeDigit(digit):
@@ -42,14 +42,14 @@ def prepareInputVector(vector):
     returnVector.shape = (784,1)
     return returnVector
 
-'''
+
 print("Beginning training...")
 
 # Stores the size of each training batch
 batchSize = 25
 
 # Training loop
-for i in range(150000):
+for i in range(60000):
     #Chooses a random training exaple index
     index = random.randint(0,59999)
     
@@ -76,7 +76,7 @@ for i in range(150000):
         # Prints that
         print("Got the number correct: " + str(isCorrect))
         print("Label: " + str(lblTrain[index]) + " | Guess: " + str(guess))
-'''
+
 # Holds how many correct guesses the computer has had
 totalCorrect = 0
 # Testing loop
