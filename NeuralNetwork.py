@@ -1,21 +1,6 @@
 import numpy as np
 import ast
 
-'''
-inputLayer = np.array([(4,10,3)])
-inputLayer.shape = (3,1)
-weightMatrix = 2*np.random.random((4,3))-1
-
-print(inputLayer)
-print(weightMatrix)
-
-hiddenLayer = np.dot(weightMatrix, inputLayer)
-
-print(hiddenLayer)
-
-'''
-
-
 class NeuralNetwork:
     
     def __init__(self, layers, weightImportFile=None, biasImportFile=None, weightCoefficient=2, weightConstant=-1, biasCoefficient=2, biasConstant=-1, learningRate=0.1):
@@ -33,6 +18,10 @@ class NeuralNetwork:
         self.biasConstant = biasConstant
         # Initializes learning rate (defaults to 0.1)
         self.learningRate = learningRate
+        # Initializes the list of gradients as empty
+        self.gradients = [0] * len(self.biasMatrices)
+        # Initializes the deltas of the weights as empty
+        self.weightDeltas = [0] * len(self.weightMatrices)
         # Initializes weight and bias matrices lists
         for i in range(len(self.weightMatrices)):
             # Initializes a weight matrix with the rows equal to the number of nodes in this layer 
@@ -58,7 +47,10 @@ class NeuralNetwork:
         for i in range(len(self.biasMatrices)):
             # Stores the shape of the matrix in the list
             self.biasMatrixShapes[i] = self.biasMatrices[i].shape
-            
+        
+        # Initializes the array sizes of the gradient and deltas lists
+        self.resetGradientsAndDeltas()
+        
         # If there is a specified file to import weights    
         if(weightImportFile != None):
             # Load weights from this file
@@ -113,6 +105,70 @@ class NeuralNetwork:
          
         # Returns the error of the output layer 
         return outputError
+    
+    
+    def computeGradientsAndDeltas(self, inputs, correctOutputs):
+        # Sets the input layer
+        self.layers[0] = inputs
+        # Feeds forward the network
+        outputs = self.feedForward()
+        # If the parameter isn't the same size as the output layer
+        if(correctOutputs.size != outputs.size):
+            # Send error and return out of function
+            print("Wrong dimensioned outputs in computeGradientsAndDeltas function")
+            return
+        # Gets the error of the output layer
+        outputError = correctOutputs - outputs
+        # A list that stores the error values going backwards (first the output error, then hidden 1, etc.)
+        errors = [outputError]
+        # Loops through the hidden layers
+        for i in range(len(self.layers)-2):
+            # Adds the error of each hidden layer, working backwards by multiplying
+            # the transpose of the weight matrix by the error in the forward layer
+            errors.append(np.dot(self.weightMatrices[len(self.weightMatrices)-(i+1)].T, errors[i]))
+        
+        for j in range(len(self.weightMatrices)):
+            # Gets the gradient of a layer in relation to the error of the forward layer
+            gradient = self.learningRate * (NeuralNetwork.dSigmoid(self.layers[len(self.layers)-(j+1)]) * errors[j])
+            # Updates the bias matrix according to the gradient
+            self.gradients[len(self.gradients)-(j+1)] = self.gradients[len(self.gradients)-(j+1)] + gradient
+            # Gets the delta of the weight matrix by multiplying the gradient with the transpose of the previous layer
+            delta = np.dot(gradient, self.layers[len(self.layers)-(j+2)].T)
+            # Updates the weights according to the delta
+            self.weightDeltas[len(self.weightDeltas)-(j+1)] = self.weightDeltas[len(self.weightDeltas)-(j+1)]+delta
+         
+        # Returns the error of the output layer 
+        return outputError
+    
+    def resetGradientsAndDeltas(self):
+        # Resets arrays to empty
+        self.gradients = [0] * len(self.biasMatrices)
+        self.weightDeltas = [0] * len(self.weightMatrices)
+        
+        # Loop through all weight matrices
+        for i in range(len(self.weightMatrices)):
+            # Sets each delta value to an array of zeros with the same shape as each weight matrix
+            self.weightDeltas[i] = np.zeros(self.weightMatrices[i].shape)
+        
+        # Loop through all bias matrices
+        for j in range(len(self.biasMatrices)):
+            # Sets each gradient value to an array of zeros with the same shape as each bias vector
+            self.gradients[j] = np.zeros(self.biasMatrices[j].shape)
+    
+    def updateWeightsAndBiases(self):
+        # Loop through all weight matrices
+        for i in range(len(self.weightMatrices)):
+            # Adds the delta of that weight matrix to that weight matrix
+            self.weightMatrices[i] = self.weightMatrices[i] + self.weightDeltas[i]
+        
+        # Loop through all bias matrices
+        for j in range(len(self.biasMatrices)):
+            # Adds each gradient to each bias vector
+            self.biasMatrices[j] = self.biasMatrices[j] + self.gradients[j]
+            
+        # Resets the values of the gradients and deltas
+        self.resetGradientsAndDeltas()
+        
     
     # Returns sigmoid of x
     @staticmethod
@@ -181,31 +237,3 @@ class NeuralNetwork:
         # Sets the weightMatrices to the list constructed from the file
         self.biasMatrices = newBiasList.copy()
     
-
-
-''''
-il = np.array([(4,10,3)])
-il.shape = (3,1)
-hl1 = np.ones((4,1))
-hl2 = np.ones((3,1))
-ol = np.ones((2,1))
-
-layers = [il,hl1,hl2,ol]
-nn = NeuralNetwork(layers)
-print(nn.feedForward())
-
-nn.saveWeightMatrices("test1.txt")
-nn.saveBiasMatrices("test.txt")
-
-il2 = np.array([(4,10,3)])
-il2.shape = (3,1)
-hl12 = np.ones((4,1))
-hl22 = np.ones((3,1))
-ol2 = np.ones((2,1))
-layers2 = [il2,hl12,hl22,ol2]
-
-nn2 = NeuralNetwork(layers2, weightImportFile="test1.txt", biasImportFile="test.txt")
-print("\n")
-print(nn2.feedForward())
-
-'''
