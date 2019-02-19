@@ -60,8 +60,8 @@ class NeuralNetwork:
             # Load biases from that file
             self.loadBiasMatrices(biasImportFile)
     
-    def feedForward(self):
-        for i in range(len(self.layers)-1):  
+    def feedForward(self, offset=0):
+        for i in range(offset, len(self.layers)-1):  
             # Initializes the layer as the dot product of the weight matrix and the last layer
             self.layers[i+1] = np.dot(self.weightMatrices[i], self.layers[i])
             # Adds a bias to each neuron
