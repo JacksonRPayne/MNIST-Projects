@@ -1,5 +1,5 @@
 # MNIST-Projects
-A collection of machine learning projects using my neural network library and the MNIST database of handwritten digits
+A collection of machine learning projects using my neural network library written in numpy and the MNIST database of handwritten digits
 
 # Features
 The neuralnetwork.py file provides 
