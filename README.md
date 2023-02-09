@@ -9,5 +9,5 @@ layer having any number of nodes.
 any input and output. 
 
 The MNISTClassifier.py file provides
-1) A neural network built with the neural network class that classifies handwritten MNIST digits.
+1) A neural network built with the neural network class that classifies images of handwritten MNIST digits.
 2) A visual tool to see the network classifying digits from the testing set in real time.
